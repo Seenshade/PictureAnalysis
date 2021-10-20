@@ -21,10 +21,21 @@ MainWindow::MainWindow(QWidget *parent)
   , url("https://backend.facecloud.tevian.ru/")
   , query_login("api/v1/login")
   , query_detect("api/v1/detect")
+  , picture_label(new QLabel)
 {
   ui->setupUi(this);
   ui->next_picture_button->setVisible(false);
   ui->prev_picture_button->setVisible(false);
+
+  picture_label->setBackgroundRole(QPalette::Base);
+//  picture_label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+  picture_label->setScaledContents(true);
+
+  ui->scrollArea->setBackgroundRole(QPalette::Dark);
+  ui->scrollArea->setWidget(picture_label);
+  ui->scrollArea->setVisible(false);
+  ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+  ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 }
 
 MainWindow::~MainWindow()
@@ -43,9 +54,13 @@ void MainWindow::on_open_picture_action_triggered()
   data_images.clear();
   QString selected_file = QFileDialog::getOpenFileName(this, 0,"", tr("Images (*.png *.jpg *.bmp)"));
   QPixmap image(selected_file);
-  image = image.scaled(ui->Picture->width(), ui->Picture->height(),Qt::IgnoreAspectRatio);
+//  image = image.scaled(picture_label->width(), picture_label->height(),Qt::IgnoreAspectRatio);
   data_images.push_back(image);
-  ui->Picture->setPixmap(*data_images.begin());
+
+//  picture_label->resize(picture_label->pixmap().size());
+  ui->scrollArea->setEnabled(true);
+  ui->scrollArea->show();
+    picture_label->setPixmap(*data_images.begin());
 }
 
 
@@ -67,7 +82,7 @@ void MainWindow::on_open_directory_action_triggered()
   cur_picture = data_images.begin();
   pos_picture = 1;
   ui->PictureBox->setTitle("Изображение " + QString::number(pos_picture) + '/' + QString::number(data_images.size()));
-  ui->Picture->setPixmap(*cur_picture);
+  picture_label->setPixmap(*cur_picture);
 }
 
 void MainWindow::on_next_picture_button_clicked()
@@ -79,7 +94,7 @@ void MainWindow::on_next_picture_button_clicked()
       cur_picture++ = std::next(cur_picture);
       pos_picture++;
     }
-  ui->Picture->setPixmap(*cur_picture);
+  picture_label->setPixmap(*cur_picture);
   ui->PictureBox->setTitle("Изображение " + QString::number(pos_picture) + '/' + QString::number(data_images.size()));
 }
 
@@ -93,7 +108,7 @@ void MainWindow::on_prev_picture_button_clicked()
       cur_picture = std::prev(cur_picture);
       pos_picture--;
     }
-  ui->Picture->setPixmap(*cur_picture);
+  picture_label->setPixmap(*cur_picture);
   ui->PictureBox->setTitle("Изображение " + QString::number(pos_picture) + '/' + QString::number(data_images.size()));
 }
 
@@ -172,4 +187,5 @@ void MainWindow::on_analys_button_clicked()
   }
 
 }
+
 

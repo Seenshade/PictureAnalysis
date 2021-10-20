@@ -59,10 +59,10 @@ private:
   QJsonArray SendImage(QByteArray&& image);
   void LoginService();
 
-
   QPixmap current_image;
 
   Ui::MainWindow *ui;
+  QLabel* picture_label;
   QVector<QPixmap> data_images;
   QVector<FaceInfo> face_info;
   QVector<QPixmap>::iterator cur_picture;

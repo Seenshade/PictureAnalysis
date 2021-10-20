@@ -14,8 +14,8 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
      <widget class="QGroupBox" name="PictureBox">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -64,31 +64,6 @@
         <string>-&gt;</string>
        </property>
       </widget>
-      <widget class="QLabel" name="Picture">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>521</width>
-         <height>331</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="mouseTracking">
-        <bool>true</bool>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-      </widget>
       <widget class="QScrollArea" name="scrollArea">
        <property name="geometry">
         <rect>
@@ -112,13 +87,9 @@
         </property>
        </widget>
       </widget>
-      <zorder>prev_picture_button</zorder>
-      <zorder>next_picture_button</zorder>
-      <zorder>scrollArea</zorder>
-      <zorder>Picture</zorder>
      </widget>
     </item>
-    <item>
+    <item row="0" column="1">
      <spacer name="horizontalSpacer">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -134,7 +105,7 @@
       </property>
      </spacer>
     </item>
-    <item>
+    <item row="0" column="2">
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="sizeConstraint">
        <enum>QLayout::SetFixedSize</enum>
