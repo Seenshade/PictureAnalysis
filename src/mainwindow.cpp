@@ -150,15 +150,15 @@ Faces MainWindow::ParseResponse(const QJsonArray &data){
     auto item = data.at(i).toObject();
     auto bbox = item["bbox"].toObject();
     FaceInfo info;
-    info.rect.height = bbox["height"].toInteger();
-    info.rect.width = bbox["width"].toInteger();
-    info.rect.x = bbox["x"].toInteger();
-    info.rect.y = bbox["y"].toInteger();
+    info.rect.height = bbox["height"].toInt();
+    info.rect.width = bbox["width"].toInt();
+    info.rect.x = bbox["x"].toInt();
+    info.rect.y = bbox["y"].toInt();
     auto demo = item["demographics"].toObject();
     auto demo_age = demo["age"].toObject();
-    info.demo_info.age = demo_age["mean"].toInteger();
+    info.demo_info.age = demo_age["mean"].toInt();
     info.demo_info.gender = demo["gender"].toString();
-    result.emplace_back(info);
+    result.push_back(info);
   }
   return result;
 }
