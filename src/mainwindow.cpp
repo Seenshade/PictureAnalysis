@@ -53,23 +53,29 @@ void MainWindow::on_open_picture_action_triggered()
 void MainWindow::on_open_directory_action_triggered()
 {
   data_images_faces.clear();
+  scene->clear();
   QString selected_directory = QFileDialog::getExistingDirectory(this, 0,"");
   QDir directory(selected_directory);
   auto file_list = directory.entryList(QStringList() << "*.jpg" << "*.JPG",QDir::Files);
-  if (file_list.size() > 1){
-    ui->next_picture_button->setVisible(true);
-    ui->prev_picture_button->setVisible(true);
-  }
-  ui->statusbar->showMessage("Обнаружено " + QString::number(file_list.size())+ " изображения(-ий).");
   for (const auto& item : file_list){
     QString image_path = selected_directory + '/' + item;
     data_images_faces.push_back({QPixmap(image_path), {}});
   }
-  pos_picture = 0;
-  ui->label_image_idx->setText("Изображение " + QString::number(pos_picture+1) + '/' + QString::number(data_images_faces.size()));
-  scene->addPixmap(data_images_faces[pos_picture].first);
-  ui->graphicsView->setScene(scene);
-  ui->analys_button->setEnabled(true);
+  if (!data_images_faces.isEmpty()){
+    pos_picture = 0;
+    ui->label_image_idx->setText("Изображение " + QString::number(pos_picture + 1) + '/' + QString::number(data_images_faces.size()));
+    scene->addPixmap(data_images_faces[pos_picture].first);
+    ui->graphicsView->setScene(scene);
+    ui->analys_button->setEnabled(true);
+    ui->next_picture_button->setVisible(true);
+    ui->prev_picture_button->setVisible(true);
+  } else {
+    ui->label_image_idx->setText("Изображение");
+    ui->statusbar->showMessage("Изображений не обнаружено");
+    ui->analys_button->setDisabled(true);
+    ui->next_picture_button->setVisible(false);
+    ui->prev_picture_button->setVisible(false);
+  }
 }
 
 void MainWindow::on_next_picture_button_clicked()
@@ -138,8 +144,8 @@ void MainWindow::DrawFaces(const QVector<FaceInfo>& faces){
   }
 }
 
-QVector<FaceInfo> MainWindow::ParseResponse(const QJsonArray &data){
-  QVector<FaceInfo> result;
+Faces MainWindow::ParseResponse(const QJsonArray &data){
+  Faces result;
   for (size_t i = 0; i < data.size() ;i++) {
     auto item = data.at(i).toObject();
     auto bbox = item["bbox"].toObject();
@@ -166,14 +172,14 @@ void MainWindow::on_analys_button_clicked()
   ui->progressBar->setValue(0);
   ui->progressBar->setMaximum(data_images_faces.size());
   for (auto& image_item : data_images_faces){
-      QByteArray bArray;
-      QBuffer buffer(&bArray);
-      buffer.open(QIODevice::WriteOnly);
-      image_item.first.save(&buffer, "JPG");
-      auto data = SendImage(mgr, url + query_detect, token, std::move(bArray));
-      QVector<FaceInfo> v_info = ParseResponse(data);
-      image_item.second = std::move(v_info);
-      ui->progressBar->setValue(ui->progressBar->value() + 1);
+    QByteArray bArray;
+    QBuffer buffer(&bArray);
+    buffer.open(QIODevice::WriteOnly);
+    image_item.first.save(&buffer, "JPG");
+    auto data = SendImage(mgr, url + query_detect, token, std::move(bArray));
+    auto v_info = ParseResponse(data);
+    image_item.second = std::move(v_info);
+    ui->progressBar->setValue(ui->progressBar->value() + 1);
   }
   DrawFaces(data_images_faces[pos_picture].second);
   ui->statusbar->showMessage("Все изображения обработаны.");
