@@ -15,17 +15,23 @@ find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Network REQUIRED)
 
-set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+set(SOURCES
+        src/main.cpp
+        src/mainwindow.cpp
+        src/network_functions.cpp
+        src/mainwindow.ui)
+
+set(HEADERS
+        include/mainwindow.h
+        include/network_functions.h)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(picture_analysis
         MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
+        ${SOURCES}
+        ${HEADERS}
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET picture_analysis APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -40,7 +46,7 @@ else()
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
         add_executable(picture_analysis
-            ${PROJECT_SOURCES}
+            ${SOURCES}
         )
     endif()
 endif()

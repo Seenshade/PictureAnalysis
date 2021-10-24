@@ -7,6 +7,7 @@
 #include <QNetworkAccessManager>
 
 #include <QGraphicsScene>
+#include <QAction>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -33,6 +34,7 @@ class MainWindow : public QMainWindow
 {
   Q_OBJECT
 
+
 public:
   MainWindow(QWidget *parent = nullptr);
 
@@ -52,25 +54,29 @@ private slots:
 
   void on_analys_button_clicked();
 
-private:
-  QString GET(const QNetworkRequest& request);
-  QString POST(const QNetworkRequest& request, QByteArray&& postData);
 
-  QJsonArray SendImage(QByteArray&& image);
+
+private:
   void LoginService();
+  void DrawFaces(const QVector<FaceInfo>& faces);
 
   QPixmap current_image;
+  QGraphicsScene* scene;
 
   Ui::MainWindow *ui;
   QLabel* picture_label;
-  QVector<QPixmap> data_images;
+//  QVector<QPixmap> data_images;
+  QVector<QPair<QPixmap, QVector<FaceInfo>>> data_images_faces;
   QVector<FaceInfo> face_info;
-  QVector<QPixmap>::iterator cur_picture;
   size_t pos_picture;
   QString url;
   QString query_login;
   QString query_detect;
   QNetworkAccessManager *mgr = new QNetworkAccessManager(this);
   QString token;
+
+  QAction* ZoomInAction;
+  QAction* ZoomOutAction;
 };
+
 #endif // MAINWINDOW_H
