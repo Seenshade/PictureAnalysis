@@ -2,6 +2,16 @@ cmake_minimum_required(VERSION 3.5)
 
 project(picture_analysis VERSION 0.1 LANGUAGES CXX)
 
+if (WIN32)
+  set(CMAKE_C_COMPILER C:/Qt/Tools/mingw810_64/bin/gcc.exe)
+  set(CMAKE_CXX_COMPILER C:/Qt/Tools/mingw810_64/bin/g++.exe)
+endif()
+
+if (UNIX)
+  set(CMAKE_C_COMPILER /usr/bin/gcc)
+  set(CMAKE_CXX_COMPILER /usr/bin/gcc)
+endif()
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -21,44 +31,19 @@ set(SOURCES
         src/main.cpp
         src/mainwindow.cpp
         src/network_functions.cpp
-        src/mainwindow.ui)
-
-set(HEADERS
+        src/mainwindow.ui
         include/mainwindow.h
         include/network_functions.h)
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 5)
     qt_add_executable(picture_analysis
         MANUAL_FINALIZATION
         ${SOURCES}
-        ${HEADERS}
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET picture_analysis APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
-else()
-    if(ANDROID)
-        add_library(picture_analysis SHARED
-            ${PROJECT_SOURCES}
-        )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else()
-        add_executable(picture_analysis
-            ${SOURCES}
-        )
-    endif()
 endif()
 
 target_link_libraries(picture_analysis PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(picture_analysis PRIVATE Qt${QT_VERSION_MAJOR}::Network)
-
-set_target_properties(picture_analysis PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-)
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(picture_analysis)
