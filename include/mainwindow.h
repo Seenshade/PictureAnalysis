@@ -59,13 +59,11 @@ private slots:
 private:
   void LoginService();
   void DrawFaces(const QVector<FaceInfo>& faces);
+  QVector<FaceInfo> ParseResponse(const QJsonArray& data);
 
   QPixmap current_image;
   QGraphicsScene* scene;
-
   Ui::MainWindow *ui;
-  QLabel* picture_label;
-//  QVector<QPixmap> data_images;
   QVector<QPair<QPixmap, QVector<FaceInfo>>> data_images_faces;
   QVector<FaceInfo> face_info;
   size_t pos_picture;
@@ -74,9 +72,6 @@ private:
   QString query_detect;
   QNetworkAccessManager *mgr = new QNetworkAccessManager(this);
   QString token;
-
-  QAction* ZoomInAction;
-  QAction* ZoomOutAction;
 };
 
 #endif // MAINWINDOW_H

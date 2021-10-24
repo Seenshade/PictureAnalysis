@@ -2,17 +2,14 @@
 #include "ui_mainwindow.h"
 #include "network_functions.h"
 
-#include "QFileDialog"
+#include <QFileDialog>
 #include <QEventLoop>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
-#include <QDebug>
 #include <QBuffer>
 #include <QGraphicsRectItem>
 #include <QGraphicsSimpleTextItem>
-#include <QPainter>
-#include <QStyleFactory>
 
 MainWindow::MainWindow(QWidget *parent)
   : QMainWindow(parent)
@@ -20,26 +17,14 @@ MainWindow::MainWindow(QWidget *parent)
   , url("https://backend.facecloud.tevian.ru/")
   , query_login("api/v1/login")
   , query_detect("api/v1/detect")
-  , picture_label(new QLabel)
   , scene(new QGraphicsScene)
-
 {
 
   ui->setupUi(this);
-//  QApplication::setStyle(QStyleFactory::create("Fusion"));
-//  QPalette p;
-//  p = qApp->palette();
-//  p.setColor(QPalette::Window, QColor(53,53,53));
-//  p.setColor(QPalette::Button, QColor(53,53,53));
-//  p.setColor(QPalette::Highlight, QColor(142,45,197));
-//  p.setColor(QPalette::ButtonText, QColor(255,255,255));
-//  qApp->setPalette(p);
   ui->progressBar->setValue(0);
   ui->next_picture_button->setVisible(false);
   ui->prev_picture_button->setVisible(false);
-
-  picture_label->setBackgroundRole(QPalette::Base);
-  picture_label->setScaledContents(true);
+  ui->analys_button->setDisabled(true);
 }
 
 MainWindow::~MainWindow()
@@ -61,7 +46,7 @@ void MainWindow::on_open_picture_action_triggered()
   pos_picture = 0;
   scene->addPixmap(image);
   ui->graphicsView->setScene(scene);
-
+  ui->analys_button->setEnabled(true);
 }
 
 
@@ -75,7 +60,7 @@ void MainWindow::on_open_directory_action_triggered()
     ui->next_picture_button->setVisible(true);
     ui->prev_picture_button->setVisible(true);
   }
-  ui->statusbar->showMessage("Обнаружено " + QString::number(file_list.size())+ " изображений");
+  ui->statusbar->showMessage("Обнаружено " + QString::number(file_list.size())+ " изображения(-ий).");
   for (const auto& item : file_list){
     QString image_path = selected_directory + '/' + item;
     data_images_faces.push_back({QPixmap(image_path), {}});
@@ -84,6 +69,7 @@ void MainWindow::on_open_directory_action_triggered()
   ui->label_image_idx->setText("Изображение " + QString::number(pos_picture+1) + '/' + QString::number(data_images_faces.size()));
   scene->addPixmap(data_images_faces[pos_picture].first);
   ui->graphicsView->setScene(scene);
+  ui->analys_button->setEnabled(true);
 }
 
 void MainWindow::on_next_picture_button_clicked()
@@ -135,7 +121,6 @@ void MainWindow::LoginService(){
 
 void MainWindow::DrawFaces(const QVector<FaceInfo>& faces){
   for (const auto& item : faces){
-    QPainter painter;
     QGraphicsRectItem* rect = new QGraphicsRectItem(item.rect.x, item.rect.y, item.rect.width, item.rect.height);
     rect->setPen(QPen(Qt::green));
 
@@ -151,6 +136,25 @@ void MainWindow::DrawFaces(const QVector<FaceInfo>& faces){
     scene->addItem(back_rect);
     scene->addItem(demo_info);
   }
+}
+
+QVector<FaceInfo> MainWindow::ParseResponse(const QJsonArray &data){
+  QVector<FaceInfo> result;
+  for (size_t i = 0; i < data.size() ;i++) {
+    auto item = data.at(i).toObject();
+    auto bbox = item["bbox"].toObject();
+    FaceInfo info;
+    info.rect.height = bbox["height"].toInteger();
+    info.rect.width = bbox["width"].toInteger();
+    info.rect.x = bbox["x"].toInteger();
+    info.rect.y = bbox["y"].toInteger();
+    auto demo = item["demographics"].toObject();
+    auto demo_age = demo["age"].toObject();
+    info.demo_info.age = demo_age["mean"].toInt();
+    info.demo_info.gender = demo["gender"].toString();
+    result.emplaceBack(info);
+  }
+  return result;
 }
 
 
@@ -169,23 +173,12 @@ void MainWindow::on_analys_button_clicked()
       buffer.open(QIODevice::WriteOnly);
       image_item.first.save(&buffer, "JPG");
       auto data = SendImage(mgr, url + query_detect, token, std::move(bArray));
-      for (size_t i = 0; i < data.size() ;i++) {
-        auto item = data.at(i).toObject();
-        auto bbox = item["bbox"].toObject();
-        FaceInfo info;
-        info.rect.height = bbox["height"].toInteger();
-        info.rect.width = bbox["width"].toInteger();
-        info.rect.x = bbox["x"].toInteger();
-        info.rect.y = bbox["y"].toInteger();
-        auto demo = item["demographics"].toObject();
-        auto demo_age = demo["age"].toObject();
-        info.demo_info.age = demo_age["mean"].toInt();
-        info.demo_info.gender = demo["gender"].toString();
-        image_item.second.emplaceBack(info);
-      }
+      auto v_info = ParseResponse(data);
+      image_item.second.emplaceBack(std::move(v_info));
       ui->progressBar->setValue(ui->progressBar->value() + 1);
   }
   DrawFaces(data_images_faces[pos_picture].second);
+  ui->statusbar->showMessage("Все изображения обработаны.");
 }
 
 
