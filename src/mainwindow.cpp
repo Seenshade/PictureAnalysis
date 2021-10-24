@@ -150,9 +150,9 @@ QVector<FaceInfo> MainWindow::ParseResponse(const QJsonArray &data){
     info.rect.y = bbox["y"].toInteger();
     auto demo = item["demographics"].toObject();
     auto demo_age = demo["age"].toObject();
-    info.demo_info.age = demo_age["mean"].toInt();
+    info.demo_info.age = demo_age["mean"].toInteger();
     info.demo_info.gender = demo["gender"].toString();
-    result.emplaceBack(info);
+    result.emplace_back(info);
   }
   return result;
 }
@@ -163,18 +163,16 @@ void MainWindow::on_analys_button_clicked()
   if (token.isEmpty()){
     LoginService();
   }
-  face_info.clear();
   ui->progressBar->setValue(0);
   ui->progressBar->setMaximum(data_images_faces.size());
-
   for (auto& image_item : data_images_faces){
       QByteArray bArray;
       QBuffer buffer(&bArray);
       buffer.open(QIODevice::WriteOnly);
       image_item.first.save(&buffer, "JPG");
       auto data = SendImage(mgr, url + query_detect, token, std::move(bArray));
-      auto v_info = ParseResponse(data);
-      image_item.second.emplaceBack(std::move(v_info));
+      QVector<FaceInfo> v_info = ParseResponse(data);
+      image_item.second = std::move(v_info);
       ui->progressBar->setValue(ui->progressBar->value() + 1);
   }
   DrawFaces(data_images_faces[pos_picture].second);

@@ -65,7 +65,6 @@ private:
   QGraphicsScene* scene;
   Ui::MainWindow *ui;
   QVector<QPair<QPixmap, QVector<FaceInfo>>> data_images_faces;
-  QVector<FaceInfo> face_info;
   size_t pos_picture;
   QString url;
   QString query_login;
