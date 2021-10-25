@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(picture_analysis VERSION 0.1 LANGUAGES CXX)
-
 if (WIN32)
+  set(CMAKE_PREFIX_PATH "C:/Qt/~/mingw81_64/bin")
   set(CMAKE_C_COMPILER C:/Qt/Tools/mingw810_64/bin/gcc.exe)
   set(CMAKE_CXX_COMPILER C:/Qt/Tools/mingw810_64/bin/g++.exe)
 endif()
@@ -11,6 +10,8 @@ if (UNIX)
   set(CMAKE_C_COMPILER /usr/bin/gcc)
   set(CMAKE_CXX_COMPILER /usr/bin/gcc)
 endif()
+
+project(picture_analysis VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -35,9 +36,13 @@ set(SOURCES
         include/mainwindow.h
         include/network_functions.h)
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 5)
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(picture_analysis
         MANUAL_FINALIZATION
+        ${SOURCES}
+    )
+else()
+    add_executable(picture_analysis
         ${SOURCES}
     )
 endif()
