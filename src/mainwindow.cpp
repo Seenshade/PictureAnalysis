@@ -144,7 +144,7 @@ void MainWindow::DrawFaces(const QVector<FaceInfo>& faces){
   }
 }
 
-Faces MainWindow::ParseResponse(const QJsonArray &data){
+Faces MainWindow::ParseResponse(const QJsonArray& data){
   Faces result;
   for (size_t i = 0; i < data.size() ;i++) {
     auto item = data.at(i).toObject();
@@ -158,7 +158,7 @@ Faces MainWindow::ParseResponse(const QJsonArray &data){
     auto demo_age = demo["age"].toObject();
     info.demo_info.age = demo_age["mean"].toInt();
     info.demo_info.gender = demo["gender"].toString();
-    result.push_back(info);
+    result.push_back(std::move(info));
   }
   return result;
 }
