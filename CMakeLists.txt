@@ -8,7 +8,7 @@ endif()
 
 if (UNIX)
   set(CMAKE_C_COMPILER /usr/bin/gcc)
-  set(CMAKE_CXX_COMPILER /usr/bin/gcc)
+  set(CMAKE_CXX_COMPILER /usr/bin/g++)
 endif()
 
 project(picture_analysis VERSION 0.1 LANGUAGES CXX)
