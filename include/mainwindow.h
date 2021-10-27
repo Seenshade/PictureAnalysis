@@ -8,6 +8,7 @@
 
 #include <QGraphicsScene>
 #include <QAction>
+#include <QQueue>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -65,7 +66,7 @@ private:
 
   QGraphicsScene* scene;
   Ui::MainWindow* ui;
-  QVector<QPair<Image, Faces>> data_images_faces;
+  QList<QPair<Image, Faces>> data_images_faces;
   size_t pos_picture;
   QString url;
   QString query_login;
